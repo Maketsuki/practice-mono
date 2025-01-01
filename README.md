@@ -1,2 +1,2 @@
-# practice-mono
-Monorepository for all practice related stuff., 
+# Practice Monorepo
+Monorepository for all practice-related stuff. 
