@@ -41,7 +41,7 @@ function* main() {
     program.push(yield);
   }
   const res = execute(program);
-  console.log(res.join(""));
+  console.log(res.join(" "));
 }
 
 const generator = main();
