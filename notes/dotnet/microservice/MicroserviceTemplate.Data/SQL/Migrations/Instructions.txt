@@ -1,0 +1,11 @@
+Create Database.
+Create New user to be used by the backend.
+
+Modify the Migrations file
+* Set the database and user
+* Set the flyway directory correctly 
+* (When run from Migrations folder everything else should work)
+
+If you need to see the output of migration run "RunMigrations" which will leave the command line open.
+
+Flyway 5.0.7 was used. Can be found on Ohjelmistot S:\flyway.
