@@ -3,3 +3,14 @@ node_modules
 /notes/dotnet/microservice/MicroserviceTemplate/appsettings.Testing.json
 /notes/dotnet/microservice/MicroserviceTemplate/appsettings.Development.json
 /notes/dotnet/microservice/MicroserviceTemplate/appsettings.Demo.json
+/notes/dotnet/microservice/MicroserviceTemplate/bin/Debug/net7.0
+/notes/dotnet/microservice/MicroserviceTemplate.Common/obj
+bin
+Debug
+/notes/dotnet/microservice/.vs
+.vs
+obj
+/dotnet/microservice/MicroserviceTemplate/appsettings.Demo.json
+/dotnet/microservice/MicroserviceTemplate/appsettings.Development.json
+/dotnet/microservice/MicroserviceTemplate/appsettings.Production.json
+/dotnet/microservice/MicroserviceTemplate/appsettings.Testing.json

@@ -2,6 +2,7 @@
 using MicroserviceTemplate.Infrastructure.ActionFilters;
 using MicroserviceTemplate.Managers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System.Net.Mime;
 
 namespace MicroserviceTemplate.Controllers
@@ -20,7 +21,9 @@ namespace MicroserviceTemplate.Controllers
     /// </remarks>
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
-    [Route("api/v1/[controller]")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class MicroserviceTemplateController : BaseApiController
     {
         private readonly IMicroserviceTemplateManager _microserviceTemplateManager;
@@ -36,16 +39,17 @@ namespace MicroserviceTemplate.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
+        [MapToApiVersion("1.0")]
         [TypeFilter(typeof(UnitOfWorkAttribute))]
-        [ProducesResponseType(typeof(ThingReturnDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Post([FromBody] ThingCreateDto dto)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ThingReturnDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+        public async Task<IResult> Post([FromBody] ThingCreateDto dto)
         {
+            if (dto is null) return Results.BadRequest("Invalid input");
             ThingReturnDto createdThing = await this._microserviceTemplateManager.CreateNewThing(dto);
-
-            return Ok(createdThing);
+            return createdThing is not null ? Results.Ok(createdThing) : Results.UnprocessableEntity();
         }
 
         /// <summary>
@@ -53,15 +57,18 @@ namespace MicroserviceTemplate.Controllers
         /// </summary>
         /// <param name="guid">Guid of the Thing</param>
         /// <returns></returns>
-        [HttpGet("{guid?}")]
-        [ProducesResponseType(typeof(ThingReturnDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get([FromRoute] Guid guid)
+        [HttpGet("{guid:guid?}")]
+        [MapToApiVersion("1.0")]
+        [OutputCache(Duration = 60)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ThingReturnDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+        public async Task<IResult> Get([FromRoute] Guid? guid = null)
         {
-            ThingReturnDto thing = await this._microserviceTemplateManager.GetThing(guid);
-            return Ok(thing);
+            if (guid is null) return Results.BadRequest("GUID is required");
+            ThingReturnDto thing = await this._microserviceTemplateManager.GetThing(guid.Value);
+            return thing is not null ? Results.Ok(thing) : Results.NotFound();
         }
 
         /// <summary>
@@ -69,15 +76,18 @@ namespace MicroserviceTemplate.Controllers
         /// </summary>
         /// <param name="guid">Guid of the Thing</param>
         /// <returns></returns>
-        [HttpDelete("{guid?}")]
+        [HttpDelete("{guid:guid?}")]
+        [MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromRoute] Guid guid)
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+        public async Task<IResult> Delete([FromRoute] Guid? guid = null)
         {
-            await this._microserviceTemplateManager.DeleteThing(guid);
 
-            return Ok();
+            if (guid is null) return Results.BadRequest("GUID is required");
+            await this._microserviceTemplateManager.DeleteThing(guid.Value);
+            return Results.Ok();
         }
     }
 }

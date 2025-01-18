@@ -3,8 +3,12 @@ using MicroserviceTemplate.Data;
 using MicroserviceTemplate.Data.Repositories;
 using MicroserviceTemplate.Managers;
 using MicroserviceTemplate.Managers.ApiManager;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -31,24 +35,55 @@ string projectxmlName = projectname + ".xml";
 //Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 //On build generate swagger documentation files. If documentation is not needed or there's a problem, then comment this part away.
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Version = "v1",
-        Title = projectname,
-        Description = ""
-
-
+        Title = "MicroserviceTemplate",
+        Description = "API v1"
     });
-    //Add base project XML for swagger to parse
-    var filePath = Path.Combine(AppContext.BaseDirectory, projectxmlName);
-    c.IncludeXmlComments(filePath);
 
-    //Add domain project XML for swagger to parse
-    var filePath2 = Path.Combine(AppContext.BaseDirectory, projectdomainxmlname);
-    c.IncludeXmlComments(filePath2);
+    c.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v2",
+        Title = "MicroserviceTemplate",
+        Description = "API v2"
+    });
+
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, projectxmlName));
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, projectdomainxmlname));
+
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        if (!apiDesc.TryGetMethodInfo(out var methodInfo)) return false;
+
+        var versions = methodInfo.DeclaringType?
+            .GetCustomAttributes(true)
+            .OfType<ApiVersionAttribute>()
+            .SelectMany(attr => attr.Versions);
+
+        return versions?.Any(v => $"v{v.ToString()}" == docName) ?? false;
+    });
+    c.TagActionsBy(api => new[] { api.GroupName });
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0); // Default version: 1.0
+    options.AssumeDefaultVersionWhenUnspecified = true; // Assume default if no version is provided
+    options.ReportApiVersions = true; // Include API version headers in the response
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // Format like "v1", "v2"
+    options.SubstituteApiVersionInUrl = true; // Replace {version} in route templates
+});
+
+
 
 //Enabling quartz if needed. If quartz is not needed the quartz package can be removed.
 //builder.Services.AddQuartz(q =>
@@ -74,8 +109,11 @@ builder.Logging.AddLog4Net();
 builder.Services.AddDbContext<MicroserviceTemplateDbContext>(options =>
 {
     options.UseLazyLoadingProxies();
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Connection"));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("Connection"),
+        npgsqlOptions => npgsqlOptions.EnableRetryOnFailure());
 });
+
 
 var app = builder.Build();
 
@@ -84,9 +122,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "API v2");
+    });
 }
-
 
 //Apply middleware that will change exceptions to status codes.
 //app.UseMiddleware<ExceptionMiddleware>();
@@ -95,9 +136,7 @@ if (app.Environment.IsDevelopment())
 //Apply middleware that will get endpoints from given url from headers
 //app.UseMiddleware<EndpointsMiddleware>();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
 
 static void RegisterRepositories(IServiceCollection services)
