@@ -45,45 +45,12 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API v1"
     });
 
-    c.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Version = "v2",
-        Title = "MicroserviceTemplate",
-        Description = "API v2"
-    });
+    var filePath = Path.Combine(AppContext.BaseDirectory, projectxmlName);
+    c.IncludeXmlComments(filePath);
 
-    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, projectxmlName));
-    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, projectdomainxmlname));
-
-    c.DocInclusionPredicate((docName, apiDesc) =>
-    {
-        if (!apiDesc.TryGetMethodInfo(out var methodInfo)) return false;
-
-        var versions = methodInfo.DeclaringType?
-            .GetCustomAttributes(true)
-            .OfType<ApiVersionAttribute>()
-            .SelectMany(attr => attr.Versions);
-
-        return versions?.Any(v => $"v{v.ToString()}" == docName) ?? false;
-    });
-    c.TagActionsBy(api => new[] { api.GroupName });
-    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+    var filePath2 = Path.Combine(AppContext.BaseDirectory, projectdomainxmlname);
+    c.IncludeXmlComments(filePath2);
 });
-
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1, 0); // Default version: 1.0
-    options.AssumeDefaultVersionWhenUnspecified = true; // Assume default if no version is provided
-    options.ReportApiVersions = true; // Include API version headers in the response
-});
-
-builder.Services.AddVersionedApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV"; // Format like "v1", "v2"
-    options.SubstituteApiVersionInUrl = true; // Replace {version} in route templates
-});
-
-
 
 //Enabling quartz if needed. If quartz is not needed the quartz package can be removed.
 //builder.Services.AddQuartz(q =>
@@ -122,11 +89,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-        options.SwaggerEndpoint("/swagger/v2/swagger.json", "API v2");
-    });
+    app.UseSwaggerUI();
 }
 
 //Apply middleware that will change exceptions to status codes.

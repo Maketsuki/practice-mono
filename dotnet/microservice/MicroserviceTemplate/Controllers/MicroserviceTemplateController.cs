@@ -21,9 +21,7 @@ namespace MicroserviceTemplate.Controllers
     /// </remarks>
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v1/[controller]")]
     public class MicroserviceTemplateController : BaseApiController
     {
         private readonly IMicroserviceTemplateManager _microserviceTemplateManager;
@@ -39,7 +37,6 @@ namespace MicroserviceTemplate.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [MapToApiVersion("1.0")]
         [TypeFilter(typeof(UnitOfWorkAttribute))]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ThingReturnDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
@@ -57,8 +54,7 @@ namespace MicroserviceTemplate.Controllers
         /// </summary>
         /// <param name="guid">Guid of the Thing</param>
         /// <returns></returns>
-        [HttpGet("{guid:guid?}")]
-        [MapToApiVersion("1.0")]
+        [HttpGet("{guid:guid}")]
         [OutputCache(Duration = 60)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ThingReturnDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
@@ -76,8 +72,7 @@ namespace MicroserviceTemplate.Controllers
         /// </summary>
         /// <param name="guid">Guid of the Thing</param>
         /// <returns></returns>
-        [HttpDelete("{guid:guid?}")]
-        [MapToApiVersion("1.0")]
+        [HttpDelete("{guid:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
