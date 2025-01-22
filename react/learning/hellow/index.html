@@ -1,5 +1,26 @@
+<!DOCTYPE html>
 <html>
+  <head>
+    <title>React without npm</title>
+    <!-- Include React and ReactDOM from CDN -->
+    <script
+      src="https://unpkg.com/react@17/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <!-- Include Babel to transpile JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
   <body>
     <div id="root"></div>
+    <script type="text/babel">
+      const element = React.createElement("p", { id: "hello" }, "Hello World!");
+      console.log(element);
+      const container = document.querySelector("#root");
+      ReactDOM.render(element, container);
+    </script>
   </body>
 </html>
