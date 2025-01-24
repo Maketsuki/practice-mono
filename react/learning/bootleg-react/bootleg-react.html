@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bootleg React</title>
+    <!-- Include React and ReactDOM from CDN -->
+    <script
+      src="https://unpkg.com/react@17/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <!-- Include Babel to transpile JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      function render(reactElement, containerDOMElement) {
+        const createdElement = document.createElement(reactElement.type);
+        createdElement.setAttribute("href", reactElement.props.href);
+        createdElement.innerText = reactElement.children;
+
+        containerDOMElement.appendChild(createdElement);
+      }
+
+      const reactElement = {
+        type: "a",
+        props: {
+          href: "https://wikipedia.org/",
+        },
+        children: "Read more on Wikipedia",
+      };
+
+      const containerDOMElement = document.querySelector("#root");
+
+      render(reactElement, containerDOMElement);
+    </script>
+  </body>
+</html>

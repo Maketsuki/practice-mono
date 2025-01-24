@@ -14,3 +14,18 @@ const firstLink = header.querySelector("a");
 // When we have the element, we can edit it!
 const node = document.querySelector("#header");
 node.setAttribute("class", "bolded-title");
+
+// We can also create new nodes!
+const element = document.createElement("div");
+
+// Now we can set attributes on the element
+element.setAttribute("style", "color: red;");
+element.innerText = "Hello world!";
+
+// It wont show up on the page until we append it to the body
+body.appendChild(element);
+
+// Finally, we can also remove elements from the page
+body.removeChild(element);
+//or
+element.remove();
