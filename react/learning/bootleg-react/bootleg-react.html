@@ -19,7 +19,11 @@
     <script type="text/babel">
       function render(reactElement, containerDOMElement) {
         const createdElement = document.createElement(reactElement.type);
-        createdElement.setAttribute("href", reactElement.props.href);
+
+        //Foreach loop for props
+        for (const prop in reactElement.props) {
+          createdElement.setAttribute(prop, reactElement.props[prop]);
+        }
         createdElement.innerText = reactElement.children;
 
         containerDOMElement.appendChild(createdElement);
