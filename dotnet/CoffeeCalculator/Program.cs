@@ -11,21 +11,46 @@
 // One cup takes 7g of coffee.
 // 6 Calculate how much money I spend on coffee in a year.
 
-int pricePer100g = 1;
-decimal numberOfCupsInPackage = 500 / 7;
-// Round the number of cups in a package to the nearest whole number
-numberOfCupsInPackage = Math.Round(numberOfCupsInPackage);
-decimal pricePerCup = (pricePer100g * 5) / numberOfCupsInPackage;
+//Constants
+const decimal dlPerCup = 1.25m;
+const decimal caffeinePerCupMg = 100;
+const decimal gramsPerCup = 7;
+const decimal pricePerPackageInEuros = 5; // Price of a 500g package
+const decimal packageWeightInGrams = 500;
+const int daysInAYear = 365;
 
+decimal pricePerCup = pricePerPackageInEuros / (packageWeightInGrams / gramsPerCup);
+
+// User input
 Console.WriteLine("How many desiliters of coffee do you drink in a day? \n **One cup is 1.15 desiliters**");
-decimal dailyAmount = int.Parse(Console.ReadLine());
-Console.WriteLine("You drink " + dailyAmount + " desiliters of coffee in a day.");
-decimal yearlyAmountDl = dailyAmount * 365;
-decimal yearlyAmountL = yearlyAmountDl / 10;
-decimal yearlyAmountCups = yearlyAmountDl / 1.25m;
-decimal yearlyAmountCaffeineMg = yearlyAmountCups * 100;
-decimal yearlycoffeeCost = Math.Round(pricePerCup * yearlyAmountCups);
-Console.WriteLine("You drink " + yearlyAmountL + " liters of coffee in a year. " +
-    "\n That means " + yearlyAmountCups + " cups in a year. " +
-    "\n That includes " + yearlyAmountCaffeineMg + " mg of caffeine!" +
-    "\n that costs you " + yearlycoffeeCost + " euros");
+
+if (!int.TryParse(Console.ReadLine(), out int dailyAmount))
+{
+    Console.WriteLine("Please enter a number");
+    return;
+}
+
+if (dailyAmount < 0)
+{
+    Console.WriteLine("Please enter a positive number");
+    return;
+}
+
+if (dailyAmount > 30)
+{
+    Console.WriteLine("That's a lot of coffee! Are you sure?");
+}
+
+// Calculations
+decimal yearlyAmountInDl = dailyAmount * daysInAYear;
+decimal yearlyAmountInLiters = yearlyAmountInDl / 10;
+decimal yearlyAmountCups = yearlyAmountInDl / dlPerCup;
+decimal yearlyAmountCaffeineMg = yearlyAmountCups * caffeinePerCupMg;
+decimal yearlyCoffeeCostInEuros = pricePerCup * yearlyAmountCups;
+
+// Output results
+Console.WriteLine($"\nYou drink {dailyAmount} desiliters of coffee in a day.");
+Console.WriteLine($"You drink {yearlyAmountInLiters:F2} liters of coffee in a year.");
+Console.WriteLine($"That means {yearlyAmountCups:F2} cups in a year.");
+Console.WriteLine($"That includes {yearlyAmountCaffeineMg:F2} mg of caffeine!");
+Console.WriteLine($"That costs you {yearlyCoffeeCostInEuros:F2} euros per year.");
