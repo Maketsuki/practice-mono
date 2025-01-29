@@ -1,5 +1,7 @@
 import time
 import random
+import threading
+import queue
 
 
 # Guitar Practice Routine Scheduler
@@ -12,6 +14,11 @@ import random
 # TODO: Add a progress bar for each practice routine part and color output
 # TODO: Different routine for acoustic or electric guitar
 # TODO: Metronome
+
+
+# Bugs:
+# Stopping will not stop the program
+# Difficult to tell when you can write skip or stop
 
 
 # Practice routine choices
@@ -47,20 +54,43 @@ ear_training_creativity = {
     "Call and Response": "\n* Record yourself playing a short phrase.\n* Try to “answer” that phrase with a new idea that complements the first."
 }
 
+# This holds user commands
+command_queue = queue.Queue()
+
+def user_input_listener():
+    while True:
+        user_input = input().strip().lower()
+        command_queue.put(user_input)
+
 
 def countdown(minutes):
     seconds_left = minutes * 60
     while seconds_left > 0:
+
+        if not command_queue.empty():
+            command = command_queue.get()
+            if command == "stop":
+                print("\nPractice session stopped.")
+                return 'stopped'
+            elif command == "skip":
+                print("\nPractice section skipped.")
+                return 'skipped'
+
         min_left = seconds_left // 60
         sec_left = seconds_left % 60
         print(f"Time remaining: {min_left:02d}:{sec_left:02d}", end="\r")
         time.sleep(1)
         seconds_left -= 1
     print("\nTime is up!\n")
+    return 'done'
 
 
 def main():
     print("Welcome to your Guitar Practice Routine!\n")
+    print("Type 'skip' to skip the current section or 'stop' to end the entire session at any time.\n")
+
+    listener_thread = threading.Thread(target=user_input_listener, daemon=True)
+    listener_thread.start()
 
     daily_warmup_key = random.choice(list(warm_ups.keys()))
     daily_technique_key = random.choice(list(techniques.keys()))
@@ -74,19 +104,27 @@ def main():
 
     print(f"Warm-Up: {daily_warmup_key} {warm_ups[daily_warmup_key]}")
     input("Press Enter to start the timer for Warm-Up...")
-    countdown(warmup_minutes)
+    result = countdown(warmup_minutes)
+    if result == 'stopped':
+        return  # End entire session immediately
 
     print(f"Technique: {daily_technique_key} {techniques[daily_technique_key]}")
     input("Press Enter to start the timer for Technique...")
     countdown(technique_minutes)
+    if result == 'stopped':
+        return  # End entire session immediately
 
     print(f"Repertoire: {daily_repertoire_key} {repertoire[daily_repertoire_key]}")
     input("Press Enter to start the timer for Repertoire...")
     countdown(repertoire_minutes)
+    if result == 'stopped':
+        return  # End entire session immediately
 
     print(f"Ear Training & Creativity: {daily_ear_creativity_key} {ear_training_creativity[daily_ear_creativity_key]}")
     input("Press Enter to start the timer for Ear Training & Creativity...")
     countdown(ear_minutes)
+    if result == 'stopped':
+        return  # End entire session immediately
 
     print("Practice session complete! Great job today.")
 
