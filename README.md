@@ -2,6 +2,8 @@
 
 Monorepository for all practice-related stuff.
 
-## Javascript
+## LOG
 
-Javascript related
+30.01.2025
+
+C related stuff. Figured out how to run C-programs locally (from Visual Studio). Tested metronome with python using winsound for Windows operating system
