@@ -5,9 +5,7 @@ import queue
 
 
 # Guitar Practice Routine Scheduler
-# TODO: Add explanations for each practice routine choice DONE
 # TODO: Add more practice routine choices
-# TODO: Add a Skip/Stop option
 # TODO: Multiple choices for each practice routine part, pick from 3 etc. 
 # TODO: Add a way to track progress
 # TODO: Add probability functionality for each practice routine part (don't get the same thing every time)
