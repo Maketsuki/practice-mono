@@ -14,3 +14,4 @@ obj
 /dotnet/microservice/MicroserviceTemplate/appsettings.Development.json
 /dotnet/microservice/MicroserviceTemplate/appsettings.Production.json
 /dotnet/microservice/MicroserviceTemplate/appsettings.Testing.json
+python/guitarscheduler/__pycache__

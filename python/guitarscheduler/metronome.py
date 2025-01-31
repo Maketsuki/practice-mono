@@ -12,9 +12,3 @@ def metronome(bpm=120, beats=4):
 
 # Usage
 # metronome(bpm=100, beats=8)
-
-def main():
-    metronome(bpm=120, beats=4)
-
-if __name__ == "__main__":
-    main()

@@ -1,7 +1,9 @@
-import time
 import random
 import threading
 import queue
+
+from metronome import metronome
+from countdown import countdown
 
 
 # Guitar Practice Routine Scheduler
@@ -61,28 +63,6 @@ def user_input_listener():
         command_queue.put(user_input)
 
 
-def countdown(minutes):
-    seconds_left = minutes * 60
-    while seconds_left > 0:
-
-        if not command_queue.empty():
-            command = command_queue.get()
-            if command == "stop":
-                print("\nPractice session stopped.")
-                return 'stopped'
-            elif command == "skip":
-                print("\nPractice section skipped.")
-                return 'skipped'
-
-        min_left = seconds_left // 60
-        sec_left = seconds_left % 60
-        print(f"Time remaining: {min_left:02d}:{sec_left:02d}", end="\r")
-        time.sleep(1)
-        seconds_left -= 1
-    print("\nTime is up!\n")
-    return 'done'
-
-
 def main():
     print("Welcome to your Guitar Practice Routine!\n")
     print("Type 'skip' to skip the current section or 'stop' to end the entire session at any time.\n")
@@ -102,25 +82,25 @@ def main():
 
     print(f"Warm-Up: {daily_warmup_key} {warm_ups[daily_warmup_key]}")
     input("Press Enter to start the timer for Warm-Up...")
-    result = countdown(warmup_minutes)
+    result = countdown(warmup_minutes, command_queue)
     if result == 'stopped':
         return  # End entire session immediately
 
     print(f"Technique: {daily_technique_key} {techniques[daily_technique_key]}")
     input("Press Enter to start the timer for Technique...")
-    countdown(technique_minutes)
+    countdown(technique_minutes, command_queue)
     if result == 'stopped':
         return  # End entire session immediately
 
     print(f"Repertoire: {daily_repertoire_key} {repertoire[daily_repertoire_key]}")
     input("Press Enter to start the timer for Repertoire...")
-    countdown(repertoire_minutes)
+    countdown(repertoire_minutes, command_queue)
     if result == 'stopped':
         return  # End entire session immediately
 
     print(f"Ear Training & Creativity: {daily_ear_creativity_key} {ear_training_creativity[daily_ear_creativity_key]}")
     input("Press Enter to start the timer for Ear Training & Creativity...")
-    countdown(ear_minutes)
+    countdown(ear_minutes, command_queue)
     if result == 'stopped':
         return  # End entire session immediately
 
