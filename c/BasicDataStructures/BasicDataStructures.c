@@ -1,14 +1,28 @@
-
 #include <stdio.h>
 
+typedef struct {
+	int arr[100];
+} Stack;
 
 
+
+Stack createStackStruct(int arr[], int size) {
+	Stack stack;
+	for (int i = 0; i < size; i++) {
+		stack.arr[i] = arr[i];
+	}
+	return stack;
+}
 
 static void printArray(int arr[], int size) {
 	for (int i = 0; i < size; i++) {
 		printf("\n%d ", arr[i]);
 	}
 	printf("\n");
+}
+
+static void printStack(Stack stack, int size) {
+	printArray(stack.arr, size);
 }
 
 
@@ -25,13 +39,8 @@ int main(__RETURN_POLICY_VOID)
 		scanf_s("%d", &stack[i]);
 	}
 
-	if (numberOfItemsInStack > 0) {
-		printf("\n\n The integers in the stack are: \n");
-		printArray(stack, numberOfItemsInStack);
-	}
-	else {
-		printf("\n\n The stack is empty. \n");
-	}
+	Stack stackStruct = createStackStruct(stack, numberOfItemsInStack);
+	printStack(stackStruct, numberOfItemsInStack);
 
     return 0;
 }
