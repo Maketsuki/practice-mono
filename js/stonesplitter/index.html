@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+Enchanting Stone Splitter:
+* Animation (Css-transitions or JS-driven animations)
+* Boundary checks (stones should not be able to move outside the window)
+* Randomized colors
+* Canvas alternative
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stonesplitter</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+        position: relative;
+        background-color: #f0f0f0;
+      }
+      .stone {
+        position: absolute;
+        background: grey;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script>
+      const container = document.getElementById("container");
+
+      // Create a stone at a specified position with a specified size
+      function createStone(x, y, size) {
+        const stone = document.createElement("div");
+        stone.className = "stone";
+        stone.style.width = size + "px";
+        stone.style.height = size + "px";
+        // Position the stone such that (x, y) is its center
+        stone.style.left = x - size / 2 + "px";
+        stone.style.top = y - size / 2 + "px";
+
+        // Add click event listener to split the stone when clicked
+        stone.addEventListener("click", function (event) {
+          event.stopPropagation(); // Prevent click events from bubbling up
+          splitStone(stone, x, y, size);
+        });
+
+        container.appendChild(stone);
+      }
+
+      // Handle splitting the stone into two smaller stones
+      function splitStone(stone, x, y, size) {
+        // Remove the original stone
+        container.removeChild(stone);
+
+        // Determine the new size for the split pieces (70% of the original)
+        const newSize = size * 0.7;
+
+        // Calculate an offset for positioning the new stones.
+        // Here, we place one stone to the left and one to the right.
+        const offset = newSize / 2;
+
+        // Create two new stones at adjusted positions
+        createStone(x - offset, y, newSize);
+        createStone(x + offset, y, newSize);
+      }
+
+      // Initialize the page with one stone in the center
+      window.addEventListener("load", function () {
+        const initialSize = 100;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        createStone(centerX, centerY, initialSize);
+      });
+    </script>
+  </body>
+</html>
