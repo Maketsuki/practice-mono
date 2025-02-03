@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock splitting tool</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        background: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // Resize canvas to full window size
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      class Rock {
+        constructor(x, y, baseRadius, points = 50, variation = 20) {
+          this.x = x;
+          this.y = y;
+          this.baseRadius = baseRadius;
+          this.points = points;
+          this.variation = variation;
+          this.path = this.generatePath();
+        }
+
+        // Generate an irregular circle path
+        generatePath() {
+          const path = new Path2D();
+          for (let i = 0; i <= this.points; i++) {
+            const angle = (i / this.points) * 2 * Math.PI;
+            // Add a random offset to the base radius
+            const randomRadius =
+              this.baseRadius +
+              (Math.random() * this.variation - this.variation / 2);
+            const px = this.x + randomRadius * Math.cos(angle);
+            const py = this.y + randomRadius * Math.sin(angle);
+            if (i === 0) path.moveTo(px, py);
+            else path.lineTo(px, py);
+          }
+          path.closePath();
+          return path;
+        }
+
+        // Draw the rock on the canvas
+        draw() {
+          ctx.fillStyle = "#ccc";
+          ctx.strokeStyle = "#333";
+          ctx.fill(this.path);
+          ctx.stroke(this.path);
+        }
+
+        // Check if a point (px, py) is inside the rock's shape
+        contains(px, py) {
+          return ctx.isPointInPath(this.path, px, py);
+        }
+      }
+
+      let rocks = [];
+
+      // Create an initial rock in the center
+      rocks.push(new Rock(canvas.width / 2, canvas.height / 2, 100));
+
+      function drawAllRocks() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        rocks.forEach((rock) => rock.draw());
+      }
+
+      // Listen for clicks on the canvas
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        for (let i = 0; i < rocks.length; i++) {
+          if (rocks[i].contains(clickX, clickY)) {
+            const clickedRock = rocks[i];
+            // Remove the clicked rock
+            rocks.splice(i, 1);
+
+            // Calculate new, smaller radius (e.g., 70% of the original)
+            const newRadius = clickedRock.baseRadius * 0.7;
+
+            // Create two new rocks, slightly offset from the original center
+            rocks.push(
+              new Rock(clickedRock.x - newRadius, clickedRock.y, newRadius)
+            );
+            rocks.push(
+              new Rock(clickedRock.x + newRadius, clickedRock.y, newRadius)
+            );
+
+            break;
+          }
+        }
+        drawAllRocks();
+      });
+
+      drawAllRocks();
+    </script>
+  </body>
+</html>

@@ -4,6 +4,14 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+03.02.2025
+
+Stonesplitter in 2D Canvas
+
+02.02.2025
+
+Started a stonesplitter project. It's a webpage, in where an user can split rocks.
+
 01.02.2025
 
 Starting practising basic Data structures with C. Reading from the user, using arrays, creating a struct.
