@@ -4,9 +4,13 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+04.05.2025
+
+Simple C-programming excercise. Trying to do things by memory, to learn the syntax better. Assignment for this is "C program that performs basic statistical calculations on an array of integers.". Not quite ready yet.
+
 03.02.2025
 
-Stonesplitter in 2D Canvas
+Stonesplitter in 2D Canvas.
 
 02.02.2025
 
