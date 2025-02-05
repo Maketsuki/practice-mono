@@ -4,6 +4,10 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+05.05.2025
+
+C-exercise continues. Did not have much time to work on this, but tried to do nested for-loop after a while doing those. Seems like it does not work, but will fix later (as they always say...).
+
 04.05.2025
 
 Simple C-programming excercise. Trying to do things by memory, to learn the syntax better. Assignment for this is "C program that performs basic statistical calculations on an array of integers.". Not quite ready yet.

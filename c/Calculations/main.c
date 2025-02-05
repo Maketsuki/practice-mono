@@ -12,8 +12,30 @@ int calculateSum(int numbers[], int arraySize) {
 	return sum;
 }
 
-int returnMinValue() {
+// TODO: This does not work, fix it
+int returnMinValue(int numbers[], int arraySize) {
+	int value = 0;
 
+	for (int i = 0;i < arraySize; i++) {
+		// Current number to check
+		int currentNumber = numbers[i];
+
+
+		for (int x = 0; x < arraySize;x++) {
+
+			// If currentnumber is larger than checked number
+			if (currentNumber > numbers[x]) {
+
+				// if the final value is larger than
+				if (value > numbers[x]) {
+					// set the new final value
+					value = numbers[x];
+				}
+			}
+		}
+
+	}
+	return value;
 }
 
 int returnMaxValue() {
@@ -41,7 +63,13 @@ void main() {
 	}
 
 	int sum = calculateSum(arrayOfNumbers, amountOfNumbers);
+	int min = returnMinValue(arrayOfNumbers, amountOfNumbers);
 
-	printf("The total sum of numbers is: %d", sum);
+	if (min == 0) {
+		printf("\n Calculation of MinValue failed");
+	}
+
+	printf("The total sum of numbers is: %d \n", sum);
+	printf("The smalles value is: %d \n", min);
 
 }
