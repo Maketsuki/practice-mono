@@ -15,22 +15,10 @@ double calculateAverage(int numbers[], int arraySize) {
 }
 
 int returnMinValue(int numbers[], int arraySize) {
-	// I had an issue in this, that if the first number was actually the smalles, we never assigned to return value..
 	int value = numbers[0];
-
-	for (int i = 0;i < arraySize; i++) {
-		// Current number to check
-		int currentNumber = numbers[i];
-
-		for (int x = 0; x < arraySize;x++) {
-			// If currentnumber is larger than checked number
-			if (currentNumber > numbers[x]) {
-				// if the final value is larger than
-				if (value > numbers[x]) {
-					// set the new final value
-					value = numbers[x];
-				}
-			}
+	for (int i = 1; i < arraySize; i++) {
+		if (numbers[i] < value) {
+			value = numbers[i];
 		}
 	}
 	return value;
@@ -38,22 +26,15 @@ int returnMinValue(int numbers[], int arraySize) {
 
 int returnMaxValue(int numbers[], int arraySize) {
 	int value = numbers[0];
-
-	for (int i = 0;i < arraySize; i++) {
-		int currentNumber = numbers[i];
-
-		for (int x = 0; x < arraySize;x++) {
-			if (currentNumber > numbers[x]) {
-				if (value < numbers[x]) {
-					value = numbers[x];
-				}
-			}
+	for (int i = 1; i < arraySize; i++) {
+		if (numbers[i] > value) {
+			value = numbers[i];
 		}
 	}
 	return value;
 }
 
-void main() {
+int main() {
 	int amountOfNumbers = 0;
 	int arrayOfNumbers[100];
 
@@ -82,6 +63,8 @@ void main() {
 
 	printf("The total sum of numbers is: %d \n", sum);
 	printf("The smallest value is: %d \n", min);
-	printf("The largest value is: %d \n", min);
+	printf("The largest value is: %d \n", max);
 	printf("Average is: %.2f \n", average);
+
+	return 0; //Returning int from main follows the ISO C standard and ensures proper return of an exit status.
 }
