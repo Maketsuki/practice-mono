@@ -1,8 +1,5 @@
 #include <stdio.h>
 
-
-
-
 int calculateSum(int numbers[], int arraySize) {
 	int sum = 0;
 
@@ -12,20 +9,22 @@ int calculateSum(int numbers[], int arraySize) {
 	return sum;
 }
 
-// TODO: This does not work, fix it
+double calculateAverage(int numbers[], int arraySize) {
+	int sum = calculateSum(numbers, arraySize);
+	return (double)sum / arraySize;
+}
+
 int returnMinValue(int numbers[], int arraySize) {
-	int value = 0;
+	// I had an issue in this, that if the first number was actually the smalles, we never assigned to return value..
+	int value = numbers[0];
 
 	for (int i = 0;i < arraySize; i++) {
 		// Current number to check
 		int currentNumber = numbers[i];
 
-
 		for (int x = 0; x < arraySize;x++) {
-
 			// If currentnumber is larger than checked number
 			if (currentNumber > numbers[x]) {
-
 				// if the final value is larger than
 				if (value > numbers[x]) {
 					// set the new final value
@@ -33,20 +32,30 @@ int returnMinValue(int numbers[], int arraySize) {
 				}
 			}
 		}
-
 	}
 	return value;
 }
 
-int returnMaxValue() {
+int returnMaxValue(int numbers[], int arraySize) {
+	int value = numbers[0];
 
+	for (int i = 0;i < arraySize; i++) {
+		int currentNumber = numbers[i];
+
+		for (int x = 0; x < arraySize;x++) {
+			if (currentNumber > numbers[x]) {
+				if (value < numbers[x]) {
+					value = numbers[x];
+				}
+			}
+		}
+	}
+	return value;
 }
 
 void main() {
-	
 	int amountOfNumbers = 0;
 	int arrayOfNumbers[100];
-
 
 	while (amountOfNumbers <= 0) {
 		printf("How many numbers do you want to enter? Enter only positive numbers\n");
@@ -64,12 +73,15 @@ void main() {
 
 	int sum = calculateSum(arrayOfNumbers, amountOfNumbers);
 	int min = returnMinValue(arrayOfNumbers, amountOfNumbers);
+	int max = returnMaxValue(arrayOfNumbers, amountOfNumbers);
+	double average = calculateAverage(arrayOfNumbers, amountOfNumbers);
 
 	if (min == 0) {
 		printf("\n Calculation of MinValue failed");
 	}
 
 	printf("The total sum of numbers is: %d \n", sum);
-	printf("The smalles value is: %d \n", min);
-
+	printf("The smallest value is: %d \n", min);
+	printf("The largest value is: %d \n", min);
+	printf("Average is: %.2f \n", average);
 }

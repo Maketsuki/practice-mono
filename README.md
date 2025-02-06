@@ -4,6 +4,10 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+06.05.2025
+
+Tested to do some coding with iPhone. User experience was quite awful. Continued C-exercise, and completed it.
+
 05.05.2025
 
 C-exercise continues. Did not have much time to work on this, but tried to do nested for-loop after a while doing those. Seems like it does not work, but will fix later (as they always say...).
