@@ -38,12 +38,30 @@ int main() {
 	int amountOfNumbers = 0;
 	int arrayOfNumbers[100];
 
-	while (amountOfNumbers <= 0) {
-		printf("How many numbers do you want to enter? Enter only positive numbers\n");
-		scanf_s("%d", &amountOfNumbers);
+	while (amountOfNumbers <= 0 || amountOfNumbers > 100) {
+		printf("How many numbers do you want to enter? Enter only positive numbers (up to 100):\n");
 
+		// Attempt to read an integer
+		int result = scanf_s("%d", &amountOfNumbers);
+
+		// Check if scanf_s successfully read one integer
+		if (result != 1) {
+			printf("You gave invalid input. Let's try again.\n");
+
+			// Clear the invalid input from the buffer
+			int ch;
+			while ((ch = getchar()) != '\n' && ch != EOF); // discard characters
+
+			amountOfNumbers = 0;  // reset to force re-prompt
+			continue;
+		}
+
+		// Additional checks for range
 		if (amountOfNumbers <= 0) {
-			printf("You entered a negative number or zero. Please enter a positive number\n");
+			printf("You entered a negative number or zero. Please enter a positive number.\n");
+		}
+		else if (amountOfNumbers > 100) {
+			printf("You entered a number greater than 100. Please enter a number up to 100.\n");
 		}
 	}
 
@@ -56,10 +74,6 @@ int main() {
 	int min = returnMinValue(arrayOfNumbers, amountOfNumbers);
 	int max = returnMaxValue(arrayOfNumbers, amountOfNumbers);
 	double average = calculateAverage(arrayOfNumbers, amountOfNumbers);
-
-	if (min == 0) {
-		printf("\n Calculation of MinValue failed");
-	}
 
 	printf("The total sum of numbers is: %d \n", sum);
 	printf("The smallest value is: %d \n", min);
