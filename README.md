@@ -4,6 +4,10 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+07.02.2025
+My birthday. Setting up the next C assigment.
+
+
 06.05.2025
 
 Tested to do some coding with iPhone. User experience was quite awful. Continued C-exercise, and completed it.
