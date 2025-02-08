@@ -4,9 +4,13 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
-07.02.2025
-My birthday. Setting up the next C assigment.
+08.02.2025
 
+Setting up GuessTheName game in C.
+
+07.02.2025
+
+My birthday. Setting up the next C assigment.
 
 06.05.2025
 
