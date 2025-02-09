@@ -39,5 +39,42 @@
 
 int main()
 {
-	return 0;
+	int amountOfGuesses = 0;
+	int rightAnswer = 15;
+	char isGameRunning = 'Y';
+
+	while (isGameRunning == 'Y') {
+		int usersAnswer = 0;
+
+		printf("Guess a number! \n");
+		scanf_s("%d", &usersAnswer);
+
+		//TODO Validate this right
+		if (usersAnswer != 1) {
+			printf("You gave invalid input. Let's try again.\n");
+
+			// Clear the invalid input from the buffer
+			int ch;
+			while ((ch = getchar()) != '\n' && ch != EOF); // discard characters
+
+			usersAnswer = 0;  // reset to force re-prompt
+			continue;
+		}
+
+		if (usersAnswer <= 0) {
+			printf("You entered a negative number or zero. Please enter a positive number.\n");
+		}
+		else {
+			if (usersAnswer < rightAnswer) {
+				printf("Too high!\n");
+			}
+			else if (usersAnswer > rightAnswer) {
+				printf("Too low!\n");
+			}
+			else {
+				printf("Correct!\n");
+				isGameRunning = 'N';
+			}
+		}
+	}
 }

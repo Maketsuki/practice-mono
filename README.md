@@ -4,9 +4,13 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+09.02.2025
+
+First version of the GuessTheNumber. Next validation and randomization must be added.
+
 08.02.2025
 
-Setting up GuessTheName game in C.
+Setting up GuessTheNumber game in C.
 
 07.02.2025
 
