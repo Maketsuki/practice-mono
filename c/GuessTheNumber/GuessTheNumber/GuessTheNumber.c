@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 
 //Objective:
@@ -37,15 +39,19 @@
 	//Keep track of the best(lowest) number of guesses the user has taken in a session.
 	//Add a limit on the number of guesses and display a "Game Over" message if the user exceeds that limit.
 
-int main()
-{
-	int amountOfGuesses = 0;
-	int rightAnswer = 15;
-	char isGameRunning = 'Y';
 
-	while (isGameRunning == 'Y') {
-		int usersAnswer = 0;
+int generateRandomNumber() {
+	srand((unsigned int)time(NULL));
 
+	return rand() % 100 + 1;
+}
+
+int getValidGuessFromUser() {
+	int usersAnswer = 0;
+	char validNumberGiven = 'N';
+
+	while (validNumberGiven != 'Y')
+	{
 		printf("Guess a number! \n");
 		int userInput = scanf_s("%d", &usersAnswer);
 
@@ -59,6 +65,38 @@ int main()
 			usersAnswer = 0;  // reset to force re-prompt
 			continue;
 		}
+		else {
+			validNumberGiven = 'Y';
+		}
+	}
+	return usersAnswer;
+}
+
+void displayResults(int rightAnswer, int amountOfGuesses) {
+	printf("The right number was %d \n", rightAnswer);
+	printf("It took you %d tries to get it right. \n", amountOfGuesses);
+}
+
+int askToPlayAgain() {
+	int result = 0;
+
+	while (result != 1 && result != 2) {
+		printf("Want to play again? (1=Yes, 2=No)\n");
+		scanf_s("%d", &result);
+	}
+	return result;
+}
+
+
+int main()
+{
+	int rightAnswer = generateRandomNumber();
+	char isGameRunning = 'Y';
+	int amountOfGuesses = 0;
+
+
+	while (isGameRunning == 'Y') {
+		int usersAnswer = getValidGuessFromUser();
 
 		if (usersAnswer <= 0) {
 			printf("You entered a negative number or zero. Please enter a positive number.\n");
@@ -66,14 +104,31 @@ int main()
 		else {
 			if (usersAnswer < rightAnswer) {
 				printf("You guessed too low!\n");
+				amountOfGuesses++;
 			}
 			else if (usersAnswer > rightAnswer) {
 				printf("Too guessed too high!\n");
+				amountOfGuesses++;
+
 			}
 			else {
 				printf("Correct!\n");
-				isGameRunning = 'N';
+				amountOfGuesses++;
+
+				displayResults(rightAnswer, amountOfGuesses);
+
+				int playAgain = askToPlayAgain();
+
+				if (playAgain == 1) {
+					amountOfGuesses = 0;
+					rightAnswer = generateRandomNumber();
+				}
+				else {
+					isGameRunning = 'N';
+				}
 			}
 		}
 	}
+	printf("Thanks for playing! \n");
+	return 0;
 }
