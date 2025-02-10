@@ -47,10 +47,9 @@ int main()
 		int usersAnswer = 0;
 
 		printf("Guess a number! \n");
-		scanf_s("%d", &usersAnswer);
+		int userInput = scanf_s("%d", &usersAnswer);
 
-		//TODO Validate this right
-		if (usersAnswer != 1) {
+		if (userInput != 1) {
 			printf("You gave invalid input. Let's try again.\n");
 
 			// Clear the invalid input from the buffer
@@ -66,10 +65,10 @@ int main()
 		}
 		else {
 			if (usersAnswer < rightAnswer) {
-				printf("Too high!\n");
+				printf("You guessed too low!\n");
 			}
 			else if (usersAnswer > rightAnswer) {
-				printf("Too low!\n");
+				printf("Too guessed too high!\n");
 			}
 			else {
 				printf("Correct!\n");
