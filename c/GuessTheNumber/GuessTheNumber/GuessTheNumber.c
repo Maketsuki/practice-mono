@@ -2,44 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
-//Objective:
-//Create a simple "Guess the Number" game where the computer randomly selects a number between 1 and 100, and the user must guess the number.
-//
-//Requirements :
-//
-//	Random Number Generation :
-//
-//Use the standard library functions(such as rand() and srand()) along with <stdlib.h> and <time.h> to generate a random number between 1 and 100.
-//Initialize the random number generator using the current time so that you get a different sequence each time the program runs.
-//User Interaction :
-//
-//Prompt the user to guess the number.
-//After each guess, provide feedback :
-//If the guess is lower than the target number, display a message like "Too low! Try again."
-//If the guess is higher than the target number, display a message like "Too high! Try again."
-//If the guess is correct, congratulate the user and display the number of attempts they took.
-//Input Validation :
-//
-//Ensure that the input is a valid integer.
-//Handle cases where the user enters non - numeric data by clearing the input buffer and re - prompting the user.
-//Looping and Replayability(Optional) :
-//
-//	After a successful guess, ask the user if they would like to play again.
-//	If yes, restart the game; if no, gracefully exit the program.
-//	Modular Design :
-//
-//Organize your code into functions.For example :
-//A function to generate the random number.
-//A function to get a valid guess from the user.
-//A function to check the guess and provide feedback.
-//The main game loop.
-//Additional Challenges(Optional) :
-
-	//Keep track of the best(lowest) number of guesses the user has taken in a session.
-	//Add a limit on the number of guesses and display a "Game Over" message if the user exceeds that limit.
-
-
 int generateRandomNumber() {
 	srand((unsigned int)time(NULL));
 
@@ -52,7 +14,7 @@ int getValidGuessFromUser() {
 
 	while (validNumberGiven != 'Y')
 	{
-		printf("Guess a number! \n");
+		printf("Guess a number between 1 and 100! \n");
 		int userInput = scanf_s("%d", &usersAnswer);
 
 		if (userInput != 1) {
@@ -66,7 +28,12 @@ int getValidGuessFromUser() {
 			continue;
 		}
 		else {
-			validNumberGiven = 'Y';
+			if (usersAnswer > 0 && usersAnswer < 100) {
+				validNumberGiven = 'Y';
+			}
+			else {
+				printf("Give number between 1-100 \n");
+			}
 		}
 	}
 	return usersAnswer;
@@ -87,16 +54,50 @@ int askToPlayAgain() {
 	return result;
 }
 
-
 int main()
 {
 	int rightAnswer = generateRandomNumber();
 	char isGameRunning = 'Y';
 	int amountOfGuesses = 0;
-
+	int triesLeft = 15;
+	int lowestGuess = 0;
+	int highestGuess = 0;
+	int lastGuess = 0;
+	int usersAnswer = 0;
 
 	while (isGameRunning == 'Y') {
-		int usersAnswer = getValidGuessFromUser();
+		if (triesLeft == 0) {
+			printf("Game is over!\n");
+
+			int playAgain = askToPlayAgain();
+
+			if (playAgain == 1) {
+				amountOfGuesses = 0;
+				triesLeft = 15;
+				lowestGuess = 0;
+				highestGuess = 0;
+				lastGuess = 0;
+				usersAnswer = 0;
+				rightAnswer = generateRandomNumber();
+			}
+			else {
+				isGameRunning = 'N';
+			}
+		}
+		else {
+			printf("You have %d tries left.\n", triesLeft);
+		}
+
+		lastGuess = usersAnswer;
+		usersAnswer = getValidGuessFromUser();
+
+		if (usersAnswer <= lastGuess) {
+			lowestGuess = usersAnswer;
+		}
+
+		if (usersAnswer >= lastGuess) {
+			highestGuess = usersAnswer;
+		}
 
 		if (usersAnswer <= 0) {
 			printf("You entered a negative number or zero. Please enter a positive number.\n");
@@ -105,15 +106,17 @@ int main()
 			if (usersAnswer < rightAnswer) {
 				printf("You guessed too low!\n");
 				amountOfGuesses++;
+				triesLeft--;
 			}
 			else if (usersAnswer > rightAnswer) {
 				printf("Too guessed too high!\n");
 				amountOfGuesses++;
-
+				triesLeft--;
 			}
 			else {
 				printf("Correct!\n");
 				amountOfGuesses++;
+				triesLeft--;
 
 				displayResults(rightAnswer, amountOfGuesses);
 
@@ -121,6 +124,11 @@ int main()
 
 				if (playAgain == 1) {
 					amountOfGuesses = 0;
+					triesLeft = 15;
+					lowestGuess = 0;
+					highestGuess = 0;
+					lastGuess = 0;
+					usersAnswer = 0;
 					rightAnswer = generateRandomNumber();
 				}
 				else {
