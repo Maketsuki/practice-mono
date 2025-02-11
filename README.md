@@ -4,6 +4,10 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+11.02.2025
+
+Improvements on GuessTheNumber. Refactoring and some bug fixing. Done as of now.
+
 10.02.2025
 
 GuessTheNumber done and user tested. Works as intented.
