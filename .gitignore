@@ -15,9 +15,7 @@ obj
 /dotnet/microservice/MicroserviceTemplate/appsettings.Production.json
 /dotnet/microservice/MicroserviceTemplate/appsettings.Testing.json
 python/guitarscheduler/__pycache__
-.vcxproj.user
-.vcxproj
-c/GuessTheNumber/GuessTheNumber/GuessTheNumber.vcxproj
 .gitignore
-c/GuessTheNumber/GuessTheNumber/GuessTheNumber.vcxproj.user
-c/GuessTheNumber/GuessTheNumber/GuessTheNumber.vcxproj.filters
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
