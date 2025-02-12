@@ -4,6 +4,10 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+12.02.2025
+
+BankAccountSimulator initialized.
+
 11.02.2025
 
 Improvements on GuessTheNumber. Refactoring and some bug fixing. Done as of now.

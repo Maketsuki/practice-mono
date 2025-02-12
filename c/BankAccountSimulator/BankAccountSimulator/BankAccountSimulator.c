@@ -55,6 +55,14 @@
 //
 
 
+void displayMenu() {
+    int _tempNumber = 1000;
+    printf("### Users Nönnöö Bank Account ###\n");
+    printf("# Current Balance: %d #\n", _tempNumber);
+}
+
+
+
 int main()
 {
     return 0;
