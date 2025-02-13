@@ -3,6 +3,10 @@
 Monorepository for all practice-related stuff.
 
 ## LOG
+13.02.2025
+
+Nothing today.
+
 
 12.02.2025
 
