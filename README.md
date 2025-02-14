@@ -3,10 +3,14 @@
 Monorepository for all practice-related stuff.
 
 ## LOG
+
+14.02.2025
+
+Continuing BankAccountSimulator
+
 13.02.2025
 
 Nothing today.
-
 
 12.02.2025
 
