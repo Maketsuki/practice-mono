@@ -65,7 +65,7 @@ void displayMenu() {
 
 int main()
 {
-    return 0;
+    return 0; // This means return success. 
 }
 
 
