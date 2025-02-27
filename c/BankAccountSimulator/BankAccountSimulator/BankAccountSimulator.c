@@ -55,16 +55,90 @@
 //
 
 
-void displayMenu() {
-    int _tempNumber = 1000;
-    printf("### Users Nönnöö Bank Account ###\n");
-    printf("# Current Balance: %d #\n", _tempNumber);
+int currentBalance = 1000;
+
+void displayMenu();
+void showMenuOptions();
+void checkBalance();
+void deposit();
+void withdraw();
+
+
+void showMenuOptions() {
+	int chosenOption;
+
+	printf("1. Check Balance\n");
+	printf("2. Deposit\n");
+	printf("3. Withdraw\n");
+	printf("4. Exit\n");
+	printf("Choose an option: ");
+	scanf_s("%d", &chosenOption);
+
+	switch (chosenOption) {
+	case 1:
+		checkBalance();
+		break;
+	case 2:
+		deposit();
+		break;
+	case 3:
+		withdraw();
+		break;
+	case 4:
+		exit(0);
+		break;
+	default:
+		printf("Invalid option. Please try again.\n");
+		showMenuOptions();
+		break;
+	}
 }
+
+void displayMenu() {
+	printf("### Users Nönnöö Bank Account ###\n");
+	printf("# Current Balance: %d #\n", currentBalance);
+	showMenuOptions();
+}
+
+	void checkBalance() {
+		printf("Your current balance is: %d\n", currentBalance);
+		displayMenu();
+	}
+
+	void deposit() {
+		int amount;
+		printf("Enter the amount to deposit: ");
+		scanf_s("%d", &amount);
+		if (amount > 0) {
+			currentBalance += amount;
+			printf("Deposit successful!\n");
+		}
+		else {
+			printf("Invalid amount. Please try again.\n");
+		}
+		displayMenu();
+	}
+
+
+	void withdraw() {
+		int amount;
+		printf("Enter the amount to withdraw: ");
+		scanf_s("%d", &amount);
+		if (amount > 0 && amount <= currentBalance) {
+			currentBalance -= amount;
+			printf("Withdrawal successful!\n");
+		}
+		else {
+			printf("Invalid amount or insufficient funds. Please try again.\n");
+		}
+		displayMenu();
+	}
 
 
 
 int main()
 {
+	displayMenu();
     return 0;
 }
 
