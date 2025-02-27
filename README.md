@@ -4,6 +4,14 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+27.02.2025
+
+Simple banking functionality.
+
+26.02.2025
+
+Continuing from a break. Continuing BankAccountSimulator
+
 14.02.2025
 
 Continuing BankAccountSimulator
