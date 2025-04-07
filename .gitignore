@@ -16,3 +16,5 @@ obj
 /dotnet/microservice/MicroserviceTemplate/appsettings.Testing.json
 python/guitarscheduler/__pycache__
 .gitignore
+/rust/hello-world-rust/target
+/rust/hello-world-rust/Cargo.lock
