@@ -12,7 +12,7 @@ namespace MentalMath
 
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent(); // Set up controls
             // sensible defaults if you added optional controls
             if (cmbOps != null)
             {
@@ -53,7 +53,7 @@ namespace MentalMath
                 case '-':
                     _left = _rng.Next(0, max + 1);
                     _right = _rng.Next(0, max + 1);
-                    if (_right > _left) (_left, _right) = (_right, _left); // avoid negatives for beginners
+                    if (_right > _left) (_left, _right) = (_right, _left); // avoid negatives for now
                     break;
                 case '×':
                     _left = _rng.Next(0, max + 1);
@@ -68,6 +68,7 @@ namespace MentalMath
             }
 
             lblQuestion.Text = $"{_left} {_op} {_right} = ?";
+            Console.WriteLine($"DEBUG: question is {lblQuestion.Text}");
             lblFeedback.Text = "";
             txtAnswer.Text = "";
             txtAnswer.Focus();
@@ -128,7 +129,7 @@ namespace MentalMath
             }
 
             if (isCorrect) { _correct++; lblFeedback.Text = "✅ Correct!"; }
-            else { lblFeedback.Text = $"❌ Oops. Correct: {CorrectAnswer()}"; }
+            else { lblFeedback.Text = $"❌ Not right!. Correct: {CorrectAnswer()}"; }
 
             lblScore.Text = $"Score: {_correct}/{_total}";
         }
@@ -143,6 +144,11 @@ namespace MentalMath
             if (keyData == Keys.Enter) { CheckAnswer(); return true; }
             if (keyData == Keys.Space) { NewQuestion(); return true; }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void lblFeedback_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

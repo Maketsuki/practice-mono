@@ -42,22 +42,22 @@
             // lblQuestion
             // 
             lblQuestion.AutoSize = true;
-            lblQuestion.Location = new Point(27, 52);
+            lblQuestion.Location = new Point(12, 25);
             lblQuestion.Name = "lblQuestion";
-            lblQuestion.Size = new Size(86, 15);
+            lblQuestion.Size = new Size(117, 15);
             lblQuestion.TabIndex = 0;
-            lblQuestion.Text = "Question Label";
+            lblQuestion.Text = "Arithmetic Question:";
             // 
             // txtAnswer
             // 
-            txtAnswer.Location = new Point(132, 52);
+            txtAnswer.Location = new Point(135, 25);
             txtAnswer.Name = "txtAnswer";
-            txtAnswer.Size = new Size(100, 23);
+            txtAnswer.Size = new Size(162, 23);
             txtAnswer.TabIndex = 1;
             // 
             // btnCheck
             // 
-            btnCheck.Location = new Point(281, 52);
+            btnCheck.Location = new Point(315, 25);
             btnCheck.Name = "btnCheck";
             btnCheck.Size = new Size(75, 23);
             btnCheck.TabIndex = 2;
@@ -67,7 +67,7 @@
             // 
             // btnNext
             // 
-            btnNext.Location = new Point(648, 388);
+            btnNext.Location = new Point(408, 25);
             btnNext.Name = "btnNext";
             btnNext.Size = new Size(75, 23);
             btnNext.TabIndex = 3;
@@ -78,16 +78,17 @@
             // lblFeedback
             // 
             lblFeedback.AutoSize = true;
-            lblFeedback.Location = new Point(27, 138);
+            lblFeedback.Location = new Point(515, 141);
             lblFeedback.Name = "lblFeedback";
             lblFeedback.Size = new Size(85, 15);
             lblFeedback.TabIndex = 4;
             lblFeedback.Text = "Feedback label";
+            lblFeedback.Click += lblFeedback_Click;
             // 
             // lblScore
             // 
             lblScore.AutoSize = true;
-            lblScore.Location = new Point(132, 138);
+            lblScore.Location = new Point(516, 108);
             lblScore.Name = "lblScore";
             lblScore.Size = new Size(64, 15);
             lblScore.TabIndex = 5;
@@ -97,14 +98,14 @@
             // 
             cmbOps.FormattingEnabled = true;
             cmbOps.Items.AddRange(new object[] { "+", "-", "×", "÷", "Mix" });
-            cmbOps.Location = new Point(396, 53);
+            cmbOps.Location = new Point(515, 24);
             cmbOps.Name = "cmbOps";
             cmbOps.Size = new Size(121, 23);
             cmbOps.TabIndex = 6;
             // 
             // numMax
             // 
-            numMax.Location = new Point(397, 119);
+            numMax.Location = new Point(516, 64);
             numMax.Name = "numMax";
             numMax.Size = new Size(120, 23);
             numMax.TabIndex = 7;
@@ -113,7 +114,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(652, 182);
             Controls.Add(numMax);
             Controls.Add(cmbOps);
             Controls.Add(lblScore);
