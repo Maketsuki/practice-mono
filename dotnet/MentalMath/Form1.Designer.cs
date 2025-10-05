@@ -63,6 +63,7 @@
             btnCheck.TabIndex = 2;
             btnCheck.Text = "Check";
             btnCheck.UseVisualStyleBackColor = true;
+            btnCheck.Click += btnCheck_Click;
             // 
             // btnNext
             // 
@@ -72,6 +73,7 @@
             btnNext.TabIndex = 3;
             btnNext.Text = "Next";
             btnNext.UseVisualStyleBackColor = true;
+            btnNext.Click += btnNext_Click;
             // 
             // lblFeedback
             // 
