@@ -4,6 +4,10 @@ Monorepository for all practice-related stuff.
 
 ## LOG
 
+05.10.2025
+
+Init MentalMath (Windows program)
+
 27.02.2025
 
 Simple banking functionality.
