@@ -72,11 +72,37 @@
         if (string.IsNullOrWhiteSpace(description)) return "Other";
         description = description.ToLower();
 
-        if (description.Contains("grocery") || description.Contains("market")) return "Groceries";
-        if (description.Contains("restaurant") || description.Contains("cafe")) return "Restaurant";
-        if (description.Contains("transport") || description.Contains("taxi") || description.Contains("bus")) return "Transport";
-        if (description.Contains("shop") || description.Contains("store")) return "Shopping";
-        if (description.Contains("utility") || description.Contains("electricity") || description.Contains("water")) return "Utilities";
+        if (description.Contains("s-market") || description.Contains("prisma") || 
+            description.Contains("k-market") || description.Contains("k-super") || 
+            description.Contains("lidl") || description.Contains("alepa") || 
+            description.Contains("sale") || description.Contains("grocery")) return "Groceries";
+
+        if (description.Contains("ravintola") || description.Contains("rav.") || 
+            description.Contains("restaurant") || description.Contains("cafe") || 
+            description.Contains("hesburger") || description.Contains("mcdonalds") ||
+            description.Contains("subway") || description.Contains("wolt") ||
+            description.Contains("foodora") || description.Contains("kimmel") ||
+            description.Contains("sushi")) return "Dining";
+
+        if (description.Contains("vr matkalla") || description.Contains("hsl") || 
+            description.Contains("transport") || description.Contains("taxi") || 
+            description.Contains("bus") || description.Contains("finnair") ||
+            description.Contains("neste") || description.Contains("abc ")) return "Transport";
+
+        if (description.Contains("apple.com") || description.Contains("itunes") || 
+            description.Contains("github") || description.Contains("paypal") || 
+            description.Contains("spotify") || description.Contains("netflix") ||
+            description.Contains("patreon") || description.Contains("google")) return "Digital Services";
+
+        if (description.Contains("energy") || description.Contains("kuntokeskus") ||
+            description.Contains("gym")) return "Health & Fitness";
+
+        if (description.Contains("shop") || description.Contains("store") || 
+            description.Contains("power") || description.Contains("gigantti") ||
+            description.Contains("hm ") || description.Contains("zalando")) return "Shopping";
+
+        if (description.Contains("vuokra") || description.Contains("vastike") ||
+            description.Contains("laina") || description.Contains("korko")) return "Housing & Finance";
 
         return "Other";
     }

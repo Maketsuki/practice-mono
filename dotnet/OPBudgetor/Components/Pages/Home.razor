@@ -3,6 +3,7 @@
 @using UglyToad.PdfPig
 @using UglyToad.PdfPig.Content
 @using System.Text
+@using System.Text.RegularExpressions
 
 <PageTitle>OPBudgetor - Financial Insights</PageTitle>
 
@@ -45,7 +46,7 @@
                             <span class="text-uppercase small fw-bold text-success">Total Income</span>
                             <i class="bi bi-arrow-up-circle-fill text-success fs-4"></i>
                         </div>
-                        <h2 class="fw-bold mt-2">@TotalIncome.ToString("C", CultureInfo.GetCultureInfo("fi-FI"))</h2>
+                        <h2 class="fw-bold mt-2">@TotalIncome.ToString("C", fiCulture)</h2>
                     </div>
                 </div>
             </div>
@@ -56,7 +57,7 @@
                             <span class="text-uppercase small fw-bold text-danger">Total Expenses</span>
                             <i class="bi bi-arrow-down-circle-fill text-danger fs-4"></i>
                         </div>
-                        <h2 class="fw-bold mt-2">@TotalExpenses.ToString("C", CultureInfo.GetCultureInfo("fi-FI"))</h2>
+                        <h2 class="fw-bold mt-2">@TotalExpenses.ToString("C", fiCulture)</h2>
                     </div>
                 </div>
             </div>
@@ -67,7 +68,7 @@
                             <span class="text-uppercase small fw-bold text-primary">Net Balance</span>
                             <i class="bi bi-wallet2 text-primary fs-4"></i>
                         </div>
-                        <h2 class="fw-bold mt-2 @(NetBalance >= 0 ? "text-dark" : "text-warning")">@NetBalance.ToString("C", CultureInfo.GetCultureInfo("fi-FI"))</h2>
+                        <h2 class="fw-bold mt-2 @(NetBalance >= 0 ? "text-dark" : "text-warning")">@NetBalance.ToString("C", fiCulture)</h2>
                     </div>
                 </div>
             </div>
@@ -79,7 +80,7 @@
                     <h5 class="card-title mb-4 fw-bold d-flex align-items-center">
                         <i class="bi bi-pie-chart-fill text-primary me-2"></i> Expense Distribution
                     </h5>
-                    <div class="chart-container">
+                    <div class="chart-container" style="min-height: 400px;">
                         <ExpenseChart Transactions="transactions" />
                     </div>
                 </div>
@@ -100,7 +101,10 @@
                         <div class="summary-item mb-4">
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted">Largest Single Expense</span>
-                                <span class="fw-bold text-danger">@transactions.Where(t=>t.Amount < 0).MinBy(t=>t.Amount)?.Amount.ToString("C", CultureInfo.GetCultureInfo("fi-FI"))</span>
+                                @{
+                                    var largest = transactions.Where(t => t.Amount < 0).OrderBy(t => t.Amount).FirstOrDefault();
+                                }
+                                <span class="fw-bold text-danger">@(largest?.Amount.ToString("C", fiCulture) ?? "€0,00")</span>
                             </div>
                             <div class="progress" style="height: 6px;">
                                 <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
@@ -110,11 +114,12 @@
                              <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted">Daily Average Spends</span>
                                 @{
-                                    var days = (transactions.Max(t => t.Date).ToDateTime(TimeOnly.MinValue) - transactions.Min(t => t.Date).ToDateTime(TimeOnly.MinValue)).TotalDays;
-                                    if (days == 0) days = 1;
+                                    var dateRange = transactions.Max(t => t.Date).ToDateTime(TimeOnly.MinValue) - transactions.Min(t => t.Date).ToDateTime(TimeOnly.MinValue);
+                                    var days = dateRange.TotalDays;
+                                    if (days <= 0) days = 1;
                                     var avg = Math.Abs(TotalExpenses) / (decimal)days;
                                 }
-                                <span class="fw-bold text-primary">@avg.ToString("C", CultureInfo.GetCultureInfo("fi-FI"))</span>
+                                <span class="fw-bold text-primary">@avg.ToString("C", fiCulture)</span>
                             </div>
                             <div class="progress" style="height: 6px;">
                                 <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
@@ -132,7 +137,6 @@
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5 anim-fade-in">
             <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold">Recent Transactions</h5>
-                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">Export CSV</button>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -152,7 +156,7 @@
                                     <div class="fw-medium">@transaction.Description</div>
                                 </td>
                                 <td class="text-end pe-4 fw-bold @(transaction.Amount >= 0 ? "text-success" : "text-dark")">
-                                    @(transaction.Amount > 0 ? "+" : "") @transaction.Amount.ToString("N2", CultureInfo.GetCultureInfo("fi-FI")) €
+                                    @(transaction.Amount > 0 ? "+" : "") @transaction.Amount.ToString("N2", fiCulture) €
                                 </td>
                             </tr>
                         }
@@ -218,7 +222,7 @@
         cursor: default;
     }
     .chart-container {
-        min-height: 300px;
+        min-height: 400px;
     }
     .alert-custom-danger {
         background-color: #fff1f2;
@@ -234,6 +238,7 @@
     private decimal TotalIncome { get; set; }
     private decimal TotalExpenses { get; set; }
     private decimal NetBalance { get; set; }
+    private readonly CultureInfo fiCulture = CultureInfo.GetCultureInfo("fi-FI");
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -278,64 +283,40 @@
     private void ParseTransactions(string text)
     {
         transactions = new List<Transaction>();
-        var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         
-        var fiCulture = CultureInfo.GetCultureInfo("fi-FI");
+        // Strict pattern for OP transactions: Date Sign Amount Type
+        var txRegex = new Regex(@"(\d{1,2}\.\d{1,2}\.\d{4})([\+\u2212\-])([\d\s\u00A0]{1,10},\d{2})(PKORTTIMAKSU|TILISIIRTO|PANO|OTTO|AUTOMAATTI|PALVELUMAKSU|KORKO|VERO|ARVOPAPERI|LUOTON|VALUUTTA)", RegexOptions.Compiled);
         
-        foreach (var line in lines)
+        var matches = txRegex.Matches(text);
+        
+        for (int i = 0; i < matches.Count; i++)
         {
-            var parts = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length < 3) continue;
+            var match = matches[i];
+            string dateStr = match.Groups[1].Value;
+            string sign = match.Groups[2].Value;
+            string amountStr = match.Groups[3].Value.Replace("\u00A0", "").Replace(" ", ""); 
+            string type = match.Groups[4].Value;
 
-            // OP Statements: Date is first (DD.MM.YYYY)
-            if (DateOnly.TryParse(parts[0], fiCulture, out var date) || 
-                DateOnly.TryParse(parts[0], CultureInfo.InvariantCulture, out date))
+            if (DateOnly.TryParse(dateStr, fiCulture, out var date))
             {
-                // We look for the amount. In OP statements, it's often followed by balance.
-                // Typical line: 01.12.2023 01.12.2023 -12,50 1500,00 Grocery Store
-                // and sometimes the description comes after amount or before.
-                
-                decimal? foundAmount = null;
-                int amountIndex = -1;
-
-                // Scan for something that looks like an amount (has comma or matches number pattern)
-                for (int i = 1; i < parts.Length; i++)
+                if (decimal.TryParse(amountStr, NumberStyles.Any, fiCulture, out var amount))
                 {
-                    var p = parts[i];
-                    // Skip if it looks like another date
-                    if (DateOnly.TryParse(p, fiCulture, out _) || DateOnly.TryParse(p, CultureInfo.InvariantCulture, out _))
-                        continue;
-
-                    if (decimal.TryParse(p, NumberStyles.Any, fiCulture, out var val) ||
-                        decimal.TryParse(p, NumberStyles.Any, CultureInfo.InvariantCulture, out val))
-                    {
-                        // In Finnish PDFs, thousands separator is sometimes space, handled by Split already.
-                        // But decimal is comma.
-                        foundAmount = val;
-                        amountIndex = i;
-                        break; 
-                    }
-                }
-
-                if (foundAmount.HasValue)
-                {
-                    // Description is the rest of the parts excluding dates and the first amount found
-                    var descParts = parts.Skip(1).ToList();
-                    descParts.RemoveAt(amountIndex - 1); 
-                    // remove second date if present (value date)
-                    if (descParts.Count > 0 && (DateOnly.TryParse(descParts[0], fiCulture, out _) || DateOnly.TryParse(descParts[0], CultureInfo.InvariantCulture, out _)))
-                    {
-                        descParts.RemoveAt(0);
-                    }
+                    if (sign == "\u2212" || sign == "-") amount = -amount;
                     
-                    var description = string.Join(" ", descParts).Trim();
-                    if (string.IsNullOrEmpty(description)) description = "Unspecified Transaction";
+                    int startOfSearch = match.Index + match.Length;
+                    // Stop at the next transaction or next line
+                    int endOfSearch = (i < matches.Count - 1) ? matches[i+1].Index : text.Length;
+                    
+                    string rawDesc = text.Substring(startOfSearch, endOfSearch - startOfSearch);
+                    
+                    // Further limit to just the first line of the snippet to avoid capturing next trans footer
+                    rawDesc = rawDesc.Split('\n')[0];
 
                     transactions.Add(new Transaction 
                     { 
                         Date = date, 
-                        Description = description, 
-                        Amount = foundAmount.Value 
+                        Description = SanitizeDescription(rawDesc, type), 
+                        Amount = amount 
                     });
                 }
             }
@@ -349,7 +330,44 @@
         }
         else
         {
-            errorMessage = "No transactions found. Please ensure this is an unencrypted OP Bank Statement PDF.";
+            errorMessage = "No transactions found. Please ensure this is an OP bank statement PDF.";
         }
+    }
+
+    private string SanitizeDescription(string raw, string type)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return type;
+        
+        // Remove known noise
+        var noise = new[] { "Tiliote", "Käyttötili", "Ajalta", "Jatkuu", "Sivu", "Tilinumero", "Kirjaus-päivä", "Arvopäivä", "Saldo", "yhteensä" };
+        foreach (var n in noise) {
+            if (raw.Contains(n)) raw = raw.Split(n)[0];
+        }
+
+        // Split and filter parts
+        var parts = raw.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        
+        // Remove parts that are purely technical IDs (long hex/digits)
+        var filteredParts = parts.Where(p => 
+            p.Length < 12 || 
+            !Regex.IsMatch(p, @"\d") ||
+            Regex.IsMatch(p, @"^[A-Z]{2,}\d+") // ID like FI123...
+        ).ToList();
+        
+        // Remove technical terms
+        var keywordsToRemove = new[] { "VIESTI", "SEPA-MAKSU", "MAKSUSTOESI", "ARKISTOINTI", "VARMENTAJA", "VIITE" };
+        filteredParts = filteredParts.Where(p => 
+            !keywordsToRemove.Any(k => p.Equals(k, StringComparison.OrdinalIgnoreCase))
+        ).ToList();
+
+        var result = string.Join(" ", filteredParts).Trim();
+        
+        // Remove leading non-letters/numbers
+        result = Regex.Replace(result, @"^[^A-ZÄÖa-z0-9]+", "").Trim();
+        
+        // Secondary ID cleanup - remove anything that looks like "622277..." at the start
+        result = Regex.Replace(result, @"^\d{8,}[A-Z0-9]*\s?", "");
+
+        return string.IsNullOrWhiteSpace(result) ? type : result;
     }
 }
