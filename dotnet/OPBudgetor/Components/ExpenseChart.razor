@@ -16,7 +16,7 @@
 
     protected override void OnInitialized()
     {
-        _pieConfig = new PieConfig(JSRuntime)
+        _pieConfig = new PieConfig()
         {
             Options = new PieOptions
             {
@@ -55,9 +55,12 @@
             
             if(expenseCategories.Any())
             {
-                var dataset = new PieDataset(expenseCategories.Values.Select(v => (double)v), JSRuntime);
+                var dataset = new PieDataset<double>(expenseCategories.Values.Select(v => (double)v));
                 dataset.BackgroundColor = expenseCategories.Keys.Select(_ => GetRandomColor()).ToArray();
-                _pieConfig.Data.Labels.AddRange(expenseCategories.Keys);
+                foreach (var label in expenseCategories.Keys)
+                {
+                    _pieConfig.Data.Labels.Add(label);
+                }
                 _pieConfig.Data.Datasets.Add(dataset);
                 _pieChart?.Update();
             }
