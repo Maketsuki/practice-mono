@@ -1,0 +1,86 @@
+@using ChartJs.Blazor
+@using ChartJs.Blazor.PieChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Enums
+
+@inject IJSRuntime JSRuntime
+
+<Chart Config="_pieConfig" @ref="_pieChart"></Chart>
+
+@code {
+    private PieConfig? _pieConfig;
+    private Chart? _pieChart;
+
+    [Parameter]
+    public List<Transaction>? Transactions { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _pieConfig = new PieConfig(JSRuntime)
+        {
+            Options = new PieOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Expenses by Category"
+                }
+            }
+        };
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Transactions != null && Transactions.Any())
+        {
+            var expenseCategories = new Dictionary<string, decimal>();
+            var expenses = Transactions.Where(t => t.Amount < 0).ToList();
+
+            foreach (var expense in expenses)
+            {
+                var category = GetCategory(expense.Description);
+                if (expenseCategories.ContainsKey(category))
+                {
+                    expenseCategories[category] += Math.Abs(expense.Amount);
+                }
+                else
+                {
+                    expenseCategories[category] = Math.Abs(expense.Amount);
+                }
+            }
+            
+            _pieConfig!.Data.Labels.Clear();
+            _pieConfig.Data.Datasets.Clear();
+            
+            if(expenseCategories.Any())
+            {
+                var dataset = new PieDataset(expenseCategories.Values.Select(v => (double)v), JSRuntime);
+                dataset.BackgroundColor = expenseCategories.Keys.Select(_ => GetRandomColor()).ToArray();
+                _pieConfig.Data.Labels.AddRange(expenseCategories.Keys);
+                _pieConfig.Data.Datasets.Add(dataset);
+                _pieChart?.Update();
+            }
+        }
+    }
+
+    private string GetCategory(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description)) return "Other";
+        description = description.ToLower();
+
+        if (description.Contains("grocery") || description.Contains("market")) return "Groceries";
+        if (description.Contains("restaurant") || description.Contains("cafe")) return "Restaurant";
+        if (description.Contains("transport") || description.Contains("taxi") || description.Contains("bus")) return "Transport";
+        if (description.Contains("shop") || description.Contains("store")) return "Shopping";
+        if (description.Contains("utility") || description.Contains("electricity") || description.Contains("water")) return "Utilities";
+
+        return "Other";
+    }
+
+    private readonly Random _random = new Random();
+    private string GetRandomColor()
+    {
+        return $"#{_random.Next(0x1000000):X6}";
+    }
+}

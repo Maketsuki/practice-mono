@@ -1,0 +1,152 @@
+@page "/"
+@using System.Globalization
+@using UglyToad.PdfPig
+@using UglyToad.PdfPig.Content
+
+<PageTitle>Home</PageTitle>
+
+<h1>OPBudgetor</h1>
+
+<p>Upload your PDF bank statement to get started.</p>
+
+<InputFile OnChange="OnInputFileChange" accept=".pdf" />
+
+@if (transactions != null && transactions.Any())
+{
+    <h2>Analysis</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Income</h5>
+                    <p class="card-text text-success">@TotalIncome.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenses</h5>
+                    <p class="card-text text-danger">@TotalExpenses.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Net Balance</h5>
+                    <p class="card-text">@NetBalance.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <ExpenseChart Transactions="transactions" />
+        </div>
+    </div>
+
+    <h2 class="mt-4">Transactions</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in transactions)
+            {
+                <tr>
+                    <td>@transaction.Date.ToShortDateString()</td>
+                    <td>@transaction.Description</td>
+                    <td>@transaction.Amount.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+
+@code {
+    private List<Transaction>? transactions;
+    private string? errorMessage;
+    private decimal TotalIncome { get; set; }
+    private decimal TotalExpenses { get; set; }
+    private decimal NetBalance { get; set; }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        errorMessage = null;
+        transactions = null;
+        TotalIncome = 0;
+        TotalExpenses = 0;
+        NetBalance = 0;
+
+        try
+        {
+            var pdfText = await ReadPdfText(e.File);
+            ParseTransactions(pdfText);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error reading or parsing PDF file: " + ex.Message;
+        }
+    }
+
+    private async Task<string> ReadPdfText(IBrowserFile file)
+    {
+        await using var memoryStream = new MemoryStream();
+        await file.OpenReadStream(maxAllowedSize: 512000).CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+
+        using var document = PdfDocument.Open(memoryStream);
+        var page = document.GetPage(1);
+        return page.Text;
+    }
+
+    // This is a basic parsing implementation.
+    // It assumes a simple format of 'Date Description Amount' on each line.
+    // This will likely need to be adjusted for the specific format of your PDF file.
+    private void ParseTransactions(string text)
+    {
+        transactions = new List<Transaction>();
+        var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var line in lines)
+        {
+            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 3)
+            {
+                if (DateOnly.TryParse(parts[0], out var date))
+                {
+                    var description = string.Join(" ", parts.Skip(1).Take(parts.Length - 2));
+                    if (decimal.TryParse(parts.Last(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount))
+                    {
+                        transactions.Add(new Transaction { Date = date, Description = description, Amount = amount });
+                    }
+                }
+            }
+        }
+
+        if (transactions.Any())
+        {
+            TotalIncome = transactions.Where(t => t.Amount > 0).Sum(t => t.Amount);
+            TotalExpenses = transactions.Where(t => t.Amount < 0).Sum(t => t.Amount);
+            NetBalance = TotalIncome + TotalExpenses;
+        }
+        else
+        {
+            errorMessage = "No transactions found. The format might not be recognized.";
+        }
+    }
+}
