@@ -1,0 +1,115 @@
+@using ChartJs.Blazor
+@using ChartJs.Blazor.PieChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Enums
+
+@inject IJSRuntime JSRuntime
+
+<Chart Config="_pieConfig" @ref="_pieChart"></Chart>
+
+@code {
+    private PieConfig? _pieConfig;
+    private Chart? _pieChart;
+
+    [Parameter]
+    public List<Transaction>? Transactions { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _pieConfig = new PieConfig()
+        {
+            Options = new PieOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Expenses by Category"
+                }
+            }
+        };
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Transactions != null && Transactions.Any())
+        {
+            var expenseCategories = new Dictionary<string, decimal>();
+            var expenses = Transactions.Where(t => t.Amount < 0).ToList();
+
+            foreach (var expense in expenses)
+            {
+                var category = GetCategory(expense.Description);
+                if (expenseCategories.ContainsKey(category))
+                {
+                    expenseCategories[category] += Math.Abs(expense.Amount);
+                }
+                else
+                {
+                    expenseCategories[category] = Math.Abs(expense.Amount);
+                }
+            }
+            
+            _pieConfig!.Data.Labels.Clear();
+            _pieConfig.Data.Datasets.Clear();
+            
+            if(expenseCategories.Any())
+            {
+                var dataset = new PieDataset<double>(expenseCategories.Values.Select(v => (double)v));
+                dataset.BackgroundColor = expenseCategories.Keys.Select(_ => GetRandomColor()).ToArray();
+                foreach (var label in expenseCategories.Keys)
+                {
+                    _pieConfig.Data.Labels.Add(label);
+                }
+                _pieConfig.Data.Datasets.Add(dataset);
+                _pieChart?.Update();
+            }
+        }
+    }
+
+    private string GetCategory(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description)) return "Other";
+        description = description.ToLower();
+
+        if (description.Contains("s-market") || description.Contains("prisma") || 
+            description.Contains("k-market") || description.Contains("k-super") || 
+            description.Contains("lidl") || description.Contains("alepa") || 
+            description.Contains("sale") || description.Contains("grocery")) return "Groceries";
+
+        if (description.Contains("ravintola") || description.Contains("rav.") || 
+            description.Contains("restaurant") || description.Contains("cafe") || 
+            description.Contains("hesburger") || description.Contains("mcdonalds") ||
+            description.Contains("subway") || description.Contains("wolt") ||
+            description.Contains("foodora") || description.Contains("kimmel") ||
+            description.Contains("sushi")) return "Dining";
+
+        if (description.Contains("vr matkalla") || description.Contains("hsl") || 
+            description.Contains("transport") || description.Contains("taxi") || 
+            description.Contains("bus") || description.Contains("finnair") ||
+            description.Contains("neste") || description.Contains("abc ")) return "Transport";
+
+        if (description.Contains("apple.com") || description.Contains("itunes") || 
+            description.Contains("github") || description.Contains("paypal") || 
+            description.Contains("spotify") || description.Contains("netflix") ||
+            description.Contains("patreon") || description.Contains("google")) return "Digital Services";
+
+        if (description.Contains("energy") || description.Contains("kuntokeskus") ||
+            description.Contains("gym")) return "Health & Fitness";
+
+        if (description.Contains("shop") || description.Contains("store") || 
+            description.Contains("power") || description.Contains("gigantti") ||
+            description.Contains("hm ") || description.Contains("zalando")) return "Shopping";
+
+        if (description.Contains("vuokra") || description.Contains("vastike") ||
+            description.Contains("laina") || description.Contains("korko")) return "Housing & Finance";
+
+        return "Other";
+    }
+
+    private readonly Random _random = new Random();
+    private string GetRandomColor()
+    {
+        return $"#{_random.Next(0x1000000):X6}";
+    }
+}
