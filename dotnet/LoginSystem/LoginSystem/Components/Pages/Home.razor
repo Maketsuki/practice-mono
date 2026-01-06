@@ -1,0 +1,15 @@
+﻿@page "/"
+
+<PageTitle>Login System</PageTitle>
+
+<h1>Welcome to the Login System!</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <p>Hello, @context.User.Identity?.Name!</p>
+        <p>You can now access protected resources.</p>
+    </Authorized>
+    <NotAuthorized>
+         <p>Please <a href="login">Login</a> or <a href="register">Register</a> to continue.</p>
+    </NotAuthorized>
+</AuthorizeView>
