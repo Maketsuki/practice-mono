@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using LoginSystem.Models
+@using LoginSystem.Services
 
 <PageTitle>Login System</PageTitle>
 
@@ -7,9 +9,71 @@
 <AuthorizeView>
     <Authorized>
         <p>Hello, @context.User.Identity?.Name!</p>
-        <p>You can now access protected resources.</p>
+        <p><a href="/create-post" class="btn btn-primary">Create New Post</a></p>
     </Authorized>
     <NotAuthorized>
          <p>Please <a href="login">Login</a> or <a href="register">Register</a> to continue.</p>
     </NotAuthorized>
 </AuthorizeView>
+
+<hr />
+
+<h2>Recent Posts</h2>
+
+@if (isLoading)
+{
+    <p>Loading posts...</p>
+}
+else if (posts == null || !posts.Any())
+{
+    <p>No posts yet. Be the first to <AuthorizeView><Authorized><a href="/create-post">create a post</a></Authorized><NotAuthorized><a href="/login">log in and create a post</a></NotAuthorized></AuthorizeView>!</p>
+}
+else
+{
+    <div class="posts-container">
+        @foreach (var post in posts)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">@post.Title</h5>
+                    <p class="card-text">@post.Content</p>
+                    <p class="text-muted small">
+                        Posted by @(post.Author?.Email ?? "Unknown") on @post.CreatedAt.ToString("MMMM dd, yyyy 'at' HH:mm")
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Post>? posts;
+    private bool isLoading = true;
+
+    [Inject]
+    private PostService PostService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPosts();
+    }
+
+    private async Task LoadPosts()
+    {
+        try
+        {
+            isLoading = true;
+            posts = await PostService.GetAllPostsAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle error - in production you'd want better error handling
+            Console.WriteLine($"Error loading posts: {ex.Message}");
+            posts = new List<Post>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

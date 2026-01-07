@@ -49,6 +49,9 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<LoginSystem.Services.AuditService>();
+builder.Services.AddScoped<LoginSystem.Services.PostService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
 
 // Rate Limiting
 builder.Services.AddRateLimiter(options =>
@@ -109,6 +112,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapAccountEndpoints();
+app.MapPostEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

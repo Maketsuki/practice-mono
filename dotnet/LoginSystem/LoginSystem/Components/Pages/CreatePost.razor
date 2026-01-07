@@ -1,0 +1,119 @@
+@page "/create-post"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using LoginSystem.Models
+@using LoginSystem.Services
+@attribute [Authorize]
+
+<PageTitle>Create Post</PageTitle>
+
+<h1>Create a New Post</h1>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(SuccessMessage))
+{
+    <div class="alert alert-success">@SuccessMessage</div>
+}
+
+<form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" @bind="Title" required />
+    </div>
+    <div class="mb-3">
+        <label for="content" class="form-label">Content</label>
+        <textarea class="form-control" id="content" rows="10" @bind="Content" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">
+        @if (IsSubmitting)
+        {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <text>Publishing...</text>
+        }
+        else
+        {
+            <text>Publish</text>
+        }
+    </button>
+</form>
+
+@code {
+    private string Title { get; set; } = string.Empty;
+    private string Content { get; set; } = string.Empty;
+    private string? ErrorMessage { get; set; }
+    private string? SuccessMessage { get; set; }
+    private bool IsSubmitting { get; set; }
+
+    [Inject]
+    private PostService PostService { get; set; } = default!;
+
+    [Inject]
+    private UserManager<ApplicationUser> UserManager { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(Title) || string.IsNullOrWhiteSpace(Content))
+        {
+            ErrorMessage = "Title and Content are required.";
+            SuccessMessage = null;
+            return;
+        }
+
+        Console.WriteLine("DEBUG: HandleSubmit called");
+
+        IsSubmitting = true;
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        try
+        {
+            var authState = await AuthenticationStateTask!;
+            var user = await UserManager.GetUserAsync(authState.User);
+            
+            if (user == null)
+            {
+                ErrorMessage = "You must be logged in to create a post.";
+                IsSubmitting = false;
+                return;
+            }
+
+            var post = await PostService.CreatePostAsync(Title, Content, user.Id);
+
+            if (post != null)
+            {
+                Console.WriteLine("DEBUG: CreatePost Page - Post created successfully");
+                SuccessMessage = "Post published successfully! Redirecting to home page...";
+                Title = string.Empty;
+                Content = string.Empty;
+                StateHasChanged(); // Force update
+                
+                // Redirect to home page after a short delay
+                await Task.Delay(1500);
+                Console.WriteLine("DEBUG: Navigating to home");
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                ErrorMessage = "Failed to publish post. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
+    }
+}
