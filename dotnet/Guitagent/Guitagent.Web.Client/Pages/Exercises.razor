@@ -1,0 +1,46 @@
+@page "/exercises"
+@using Guitagent.Shared.DTOs
+@using Guitagent.Web.Client.Services
+@inject IExerciseService _ExerciseService
+
+<h3>Exercises</h3>
+
+@if (exercises == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Skill</th>
+                <th>Duration (m)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var exercise in exercises)
+            {
+                <tr>
+                    <td>@exercise.Name</td>
+                    <td>@exercise.Description</td>
+                    <td>@exercise.Type</td>
+                    <td>@exercise.SkillLevel</td>
+                    <td>@exercise.DefaultDurationMinutes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ExerciseDto>? exercises;
+
+    protected override async Task OnInitializedAsync()
+    {
+        exercises = await _ExerciseService.GetExercisesAsync();
+    }
+}

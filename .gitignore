@@ -19,3 +19,4 @@ python/guitarscheduler/__pycache__
 /rust/hello-world-rust/target
 /rust/hello-world-rust/Cargo.lock
 .DS_Store
+dotnet/Guitagent/agents.md
