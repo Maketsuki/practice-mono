@@ -1,9 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres")
-    .WithDataVolume();
-
-var db = postgres.AddDatabase("guitagent-db");
+// Use a connection string named "guitagent-db" instead of a Docker container
+var db = builder.AddConnectionString("guitagent-db");
 
 var api = builder.AddProject<Projects.Guitagent_API>("api")
     .WithReference(db);
@@ -13,3 +11,4 @@ builder.AddProject<Projects.Guitagent_Web>("web")
     .WithExternalHttpEndpoints();
 
 builder.Build().Run();
+
