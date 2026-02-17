@@ -9,7 +9,12 @@ builder.Services.AddHttpForwarder();
 
 // Add services to the container.
 builder.Services.AddHttpClient<IExerciseService, ExerciseService>(client => 
-    client.BaseAddress = new("https+http://api"));
+    client.BaseAddress = new("https+http://api"))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    });
+
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
